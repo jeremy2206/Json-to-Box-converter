@@ -83,7 +83,7 @@ def convertir_json(data):
             else:
                 part_name = "UNKNOWN"
             
-            # Conversion de la ligne en format demandé
+            # Conversion de la ligne
             result += f"BOX:{part_name} {origin[0]} {origin[1]} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[1]} {uv[0]}\n"
     
     return result
@@ -93,7 +93,6 @@ def generate_output_file_name(json_file_name):
     current_time = datetime.now()
     return f"{json_file_name}_{current_time.strftime('%y%m%d%H%M%S')}.txt"
 
-# Création de la fenêtre principale
 root = tk.Tk()
 root.title("Convertisseur JSON")
 
@@ -109,5 +108,5 @@ convert_button.pack(pady=10)
 info_label = tk.Label(root, text="")
 info_label.pack(pady=10)
 
-# Lancement de la boucle principale de l'interface graphique
+
 root.mainloop()
