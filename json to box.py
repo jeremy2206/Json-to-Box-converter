@@ -49,43 +49,47 @@ def convertir():
 
 def convertir_json(data):
     result = ""
-    
+    defined_names = ["0rightLeg", "1leftLeg", "0rightArm", "1leftArm", "head", "body"]
+
     for bone in data.get("geometry.cosmetic", {}).get("bones", []):
         name = bone.get("name", "")
-        
-        cubes = bone.get("cubes", [])
-        for cube in cubes:
-            size = cube.get("size", [0, 0, 0])
-            uv = cube.get("uv", [0, 0])
-            origin = cube.get("origin", [0, 0, 0])
-            
-            part_name = None
-            if name == "0rightLeg":
-                part_name = "LEG0"
-                origin[0] += 2  # +2x
-            elif name == "1leftLeg":
-                part_name = "LEG1"
-                origin[0] -= 2  # -2x
-            elif name == "0rightArm":
-                part_name = "ARM0"
-                origin[0] += 5 # +5x
-                origin[1] -= 14  # -14y
-            elif name == "1leftArm":
-                part_name = "ARM1"
-                origin[0] -= 5  # -5x
-                origin[1] -= 14  # -14y
-            elif name == "head":
-                part_name = "HEAD"
-                origin[1] -= 32  # -32y 
-            elif name == "body":
-                part_name = "BODY"
-                origin[1] -= 12  # -12y
-            else:
-                part_name = "UNKNOWN"
-            
-            # Conversion de la ligne
-            result += f"BOX:{part_name} {origin[0]} {origin[1]} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[1]} {uv[0]}\n"
-    
+        parent = bone.get("parent", "")
+
+        # Si le nom ou le nom de la parent est déjà défini
+        if name in defined_names or parent in defined_names:
+            cubes = bone.get("cubes", [])
+            for cube in cubes:
+                size = [round(val) for val in cube.get("size", [0, 0, 0])]
+                uv = [round(val) for val in cube.get("uv", [0, 0])]
+                origin = [round(val) for val in cube.get("origin", [0, 0, 0])]
+
+                part_name = None
+                if name == "0rightLeg" or parent == "0rightLeg":
+                    part_name = "LEG0"
+                    origin[0] += 2  # +2x
+                elif name == "1leftLeg" or parent == "1leftLeg":
+                    part_name = "LEG1"
+                    origin[0] -= 2  # -2x
+                elif name == "0rightArm" or parent == "0rightArm":
+                    part_name = "ARM0"
+                    origin[0] += 5  # +5x
+                    origin[1] -= 14  # -14y
+                elif name == "1leftArm" or parent == "1leftArm":
+                    part_name = "ARM1"
+                    origin[0] -= 5  # -5x
+                    origin[1] -= 14  # -14y
+                elif name == "head" or parent == "head":
+                    part_name = "HEAD"
+                    origin[1] -= 32  # -32y
+                elif name == "body" or parent == "body":
+                    part_name = "BODY"
+                    origin[1] -= 12  # -12y
+                else:
+                    part_name = "UNKNOWN"
+
+                # Conversion de la ligne
+                result += f"BOX:{part_name} {origin[0]} {origin[1]} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[0]} {uv[1]}\n"
+
     return result
 
 def generate_output_file_name(json_file_name):
