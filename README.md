@@ -1,1 +1,1 @@
-# unfinished and fully functional
+# unfinished and not fully functional
