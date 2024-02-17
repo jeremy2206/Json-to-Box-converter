@@ -68,23 +68,25 @@ def convertir_json(data):
                 if name == "0rightLeg" or parent == "0rightLeg":
                     part_name = "LEG0"
                     origin[0] += 2  # +2x
+                    origin[1] += 12 # 0x -> +12y
                 elif name == "1leftLeg" or parent == "1leftLeg":
                     part_name = "LEG1"
                     origin[0] -= 2  # -2x
+                    origin[1] += 12 # 0x -> +12y
                 elif name == "0rightArm" or parent == "0rightArm":
                     part_name = "ARM0"
                     origin[0] += 5  # +5x
-                    origin[1] -= 14  # -14y
+                    origin[1] += 22  # -14y -> 22y
                 elif name == "1leftArm" or parent == "1leftArm":
                     part_name = "ARM1"
                     origin[0] -= 5  # -5x
-                    origin[1] -= 14  # -14y
+                    origin[1] += 22  # -14y -> +22y
                 elif name == "head" or parent == "head":
                     part_name = "HEAD"
-                    origin[1] -= 32  # -32y
+                    origin[1] += 24  # -32y -> +24y
                 elif name == "body" or parent == "body":
                     part_name = "BODY"
-                    origin[1] -= 12  # -12y
+                    origin[1] += 24  # -12y -> +24y
                 else:
                     part_name = "UNKNOWN"
 
