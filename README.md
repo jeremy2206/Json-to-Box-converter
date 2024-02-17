@@ -1,5 +1,3 @@
-# unfinished and not fully functional
-
 # JSON to BOX Converter
 - Made by Jerem2206
 - Country Language EN
