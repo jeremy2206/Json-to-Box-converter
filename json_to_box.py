@@ -4,14 +4,19 @@ from PIL import ImageTk, Image, ImageFont, ImageDraw
 import json
 import os
 from datetime import datetime
+from pypresence import Presence
 import time
 import threading
 
 box_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "box")
 data = None
-json_file_name = None  # Stocker le nom du fichier JSON
+json_file_name = None 
 nombre_convertit = 0
 use_offset = False
+
+# Vérifier et créer le dossier "box" s'il n'existe pas
+if not os.path.exists(box_folder):
+    os.makedirs(box_folder)
 
 def charger_fichier():
     global data, json_file_name  # Déclarer data et json_file_name comme globales
@@ -120,6 +125,32 @@ def toggle_offset():
     global use_offset
     use_offset = not use_offset
     offset_checkbutton.config(text="Offset ON" if use_offset else "Offset OFF")
+
+#----------------------------------------------------------------------------------------
+
+def discord_rich_presence():
+    global nombre_convertit  # Déclarer nombre_convertit comme une variable globale
+    # Initialiser Discord Rich Presence avec l'ID de votre application
+    client_id = '1208572315282047006'
+    RPC = Presence(client_id)
+    RPC.connect()
+
+    # Boucle pour maintenir la connexion
+    try:
+        while True:
+            # Mettre à jour le statut toutes les 15 secondes (la limite est de 15 secondes par Discord)
+            if nombre_convertit<=1:
+                RPC.update(state="Converting a skin", details=f"{nombre_convertit} skin converted", large_image="logo", large_text=":)")
+            else:
+                RPC.update(state="Converting a skin", details=f"{nombre_convertit} skins converted", large_image="logo", large_text=":)")
+            time.sleep(15)  
+    except KeyboardInterrupt:
+        RPC.close()
+
+# Exécuter Discord Rich Presence dans un thread séparé
+discord_thread = threading.Thread(target=discord_rich_presence)
+discord_thread.daemon = True
+discord_thread.start()
 
 #-------------------------------------------------------------------------------------------------
 
