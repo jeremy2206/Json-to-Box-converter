@@ -188,8 +188,11 @@ def convertir_json(data, use_offset=False):
                     offset = base_coordinates.get(part_name, 0) - origin[1]
                     offsets[part_name] = offset
 
-                # Conversion de la ligne
-                result += f"BOX:{part_name} {origin[0]} {base_coordinates.get(part_name, 0)} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[0]} {uv[1]}\n"
+                # Utilisation des coordonnées de base uniquement si l'option d'offset est activée
+                if use_offset:
+                    result += f"BOX:{part_name} {origin[0]} {base_coordinates.get(part_name, 0)} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[0]} {uv[1]}\n"
+                else:
+                    result += f"BOX:{part_name} {origin[0]} {origin[1]} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[0]} {uv[1]}\n"
 
     if use_offset:
         for part_name, offset in offsets.items():
@@ -200,6 +203,7 @@ def convertir_json(data, use_offset=False):
             result += f"OFFSET:{part_name} Y {offset}\n"
 
     return result
+
 
 def toggle_offset():
     global use_offset
