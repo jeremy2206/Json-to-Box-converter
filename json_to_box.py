@@ -8,7 +8,9 @@ from pypresence import Presence
 import time
 import threading
 import webbrowser
-import shutil
+#import shutil
+import sys
+import os
 
 data = None
 json_file_name = None  # Stocker le nom du fichier JSON
@@ -238,17 +240,17 @@ def toggle_offset():
 #-------------------------------------------------------------------------------------------------
 
 
-
-
 def generate_output_folder_name(json_file_name, skin_id):
+    # Obtenir le chemin absolu du répertoire de travail actuel
+    current_directory = os.getcwd()
+    
     # Générer le nom du dossier avec le format NOMDUJSON_YYMMDDHHMMSS_IDDUSKIN
     current_time = datetime.now()
-    return f"{json_file_name}_{current_time.strftime('%y-%m-%d-%H-%M-%S')}_{skin_id}"
+    return os.path.join(current_directory, "box", f"{json_file_name}_{current_time.strftime('%y-%m-%d-%H-%M-%S')}_{skin_id}")
 
 def generate_output_file_name(json_file_name, skin_id):
     # Générer le nom du fichier avec le format dlcskinIDDUSKIN.png.txt
     return f"dlcskin{skin_id}.png.txt"
-
 
 
 #-------------------------------------------------------------------------------------------------
