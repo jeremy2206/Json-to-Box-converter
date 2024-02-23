@@ -17,10 +17,19 @@ An easier way to create customs skin for PCK Studio
 - and you can import the skin with PCK Studio (import ans select the txt)
 ---
 ## Roadmap
-
-### Converter Things
 - [x] Can open a json file
 - [x] Can do the convert process
+- [x] Can Save txt in the box folder (python)
+- [ ] Can Save txt in the box folder (exe)
+- [ ] Can Save the png in the box folder (python)
+- [ ] Can Save the png in the box folder (exe)
+### Converter Things [BOX]
 - [x] Can convert some basic skin
-- [x] Can convert all skin (idk)
+- [x] Can convert all skin
+### Converter Things [OFFSET]
+- [x] Can convert sskin with the auto offset [Not working for all]
+- [ ] Can put manually the offset for each part
+- [ ] Convert work for all skin
+### Converter Things [ANIM]
+- [ ] can choose between a list of ANIM
 
