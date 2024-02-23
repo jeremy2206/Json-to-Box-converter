@@ -20,7 +20,7 @@ An easier way to create customs skin for PCK Studio
 - [x] Can open a json file
 - [x] Can do the convert process
 - [x] Can Save txt in the box folder (python)
-- [ ] Can Save txt in the box folder (exe)
+- [x] Can Save txt in the box folder (exe)
 - [ ] Can Save the png in the box folder (python)
 - [ ] Can Save the png in the box folder (exe)
 ### Converter Things [BOX]
