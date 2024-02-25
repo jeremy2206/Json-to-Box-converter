@@ -18,6 +18,7 @@ nombre_convertit = 0
 use_offset = False
 skin_id = None
 skin_image_path = None
+offset_values = {"HEAD": 0, "BODY": 0, "ARM0": 0, "ARM1": 0, "LEG0": 0, "LEG1": 0}
 
 
 
@@ -135,12 +136,15 @@ def set_skin_id(event):
     global skin_id
     skin_id = skin_id_entry.get()
 
-def convertir_json(data, use_offset=False):
-    result = ""
-    offsets = {"HEAD": 0, "BODY": 0, "ARM0": 0, "ARM1": 0, "LEG0": 0, "LEG1": 0}
+def convertir_json(data, use_auto_offset=False):
+    boxes_info = []  # Stocker les informations sur les boîtes
+    offsets_info = []  # Stocker les informations sur les offsets
+
     base_coordinates = {"HEAD": -8, "BODY": 0, "ARM0": -2, "ARM1": -2, "LEG0": 0, "LEG1": 0}
 
     defined_names = ["0rightLeg", "1leftLeg", "0rightArm", "1leftArm", "head", "body"]
+
+    result = ""  # Initialiser le résultat vide
 
     result += "DISPLAYNAME:Skin Name\n"
     result += f"DISPLAYNAMEID:IDS_dlcskin_{skin_id}_DISPLAYNAME\n"
@@ -148,7 +152,7 @@ def convertir_json(data, use_offset=False):
     result += "THEMENAME:Theme Name\n"
     result += "GAME_FLAGS:0x18\n"
     result += "FREE:1\n"
-
+    
     for bone in data.get("geometry.cosmetic", {}).get("bones", []):
         name = bone.get("name", "")
         parent = bone.get("parent", "")
@@ -186,31 +190,27 @@ def convertir_json(data, use_offset=False):
                 else:
                     part_name = "UNKNOWN"
 
-                if use_offset:
-                    offset = base_coordinates.get(part_name, 0) - origin[1]
-                    offsets[part_name] = offset
-
-                # Utilisation des coordonnées de base uniquement si l'option d'offset est activée
-                if use_offset:
-                    result += f"BOX:{part_name} {origin[0]} {base_coordinates.get(part_name, 0)} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[0]} {uv[1]}\n"
+                if use_auto_offset:
+                    offset = origin[1] - base_coordinates.get(part_name, 0)
                 else:
-                    result += f"BOX:{part_name} {origin[0]} {origin[1]} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[0]} {uv[1]}\n"
+                    offset_entry_value = offset_entries.get(part_name).get()
+                    offset = int(offset_entry_value) if offset_entry_value else 0
 
-    if use_offset:
-        for part_name, offset in offsets.items():
-            if offset < 0:
-                offset = abs(offset)
-            else:
-                offset = -offset
-            result += f"OFFSET:{part_name} Y {offset}\n"
+                box_info = f"BOX:{part_name} {origin[0]} {origin[1]} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[0]} {uv[1]}\n"
+                offset_info = f"OFFSET:{part_name} Y {offset}\n"
 
+                boxes_info.append(box_info)
+                offsets_info.append(offset_info)
+
+    # Écrire les informations sur les boîtes d'abord, puis les offsets dans le fichier
+    result += "".join(boxes_info) + "".join(offsets_info)
     return result
 
 
 def toggle_offset():
     global use_offset
     use_offset = not use_offset
-    offset_checkbutton.config(text="Offset ON" if use_offset else "Offset OFF")
+    offset_checkbutton.config(text="Auto Offset ON" if use_offset else "Auto Offset OFF")
 
 
 
@@ -259,7 +259,7 @@ def generate_output_file_name(json_file_name, skin_id):
 
 root = tk.Tk()
 root.title("JSON To Box Converter")
-root.geometry("500x250")
+root.geometry("400x350")
 root.resizable(False, False)
 IconPath = os.path.abspath("assets/icon.ico")
 root.iconbitmap(IconPath)
@@ -285,12 +285,12 @@ TitleAppImageHeight = 35
 TitleAppImage = Image.new("RGBA", (TitleAppImageWidth, TitleAppImageHeight), (255, 255, 255, 0))
 TitleAppDraw = ImageDraw.Draw(TitleAppImage)
 TitleAppOutlineColor = (0, 0, 0)
-TitleAppOutlinePosition = (89.5, 4)
+TitleAppOutlinePosition = (46.5, 4)
 TitleAppDraw.text(TitleAppOutlinePosition, TitleAppText, font=TitleAppFont, fill=TitleAppOutlineColor)
 
 # Draw Text
 TitleAppTextColor = (255, 255, 255)
-TitleAppTextPosition = (87, 2)
+TitleAppTextPosition = (44, 2)
 TitleAppDraw.text(TitleAppTextPosition, TitleAppText, font=TitleAppFont, fill=TitleAppTextColor)
 
 # Convert Image to tk
@@ -335,26 +335,35 @@ load_button.configure(relief="solid", bd=2)
 
 # Entrée de texte pour saisir l'ID du skin
 skin_id_label = tk.Label(root, text="Skin ID:")
-skin_id_entry = tk.Entry(root)
+skin_id_entry = tk.Entry(root, width=15)  # Définir une largeur précise
 skin_id_label.grid(row=2, column=0, padx=10, sticky="w")
-skin_id_entry.grid(row=2, column=0, padx=60, sticky="ew")
+skin_id_entry.grid(row=2, column=0, padx=(60, 0), sticky="w")  # Ajuster le padx pour centrer la zone de texte
 skin_id_entry.bind("<Return>", set_skin_id)
 
 # Bouton pour activer/désactiver l'option d'offset
 use_offset_var = tk.BooleanVar()
-offset_checkbutton = tk.Checkbutton(root, text="Offset", variable=use_offset_var, command=toggle_offset)
-offset_checkbutton.grid(row=2, column=1, columnspan=2, padx=10, sticky="ew")
+offset_checkbutton = tk.Checkbutton(root, text="Auto Offset", variable=use_offset_var, command=toggle_offset)
+offset_checkbutton.grid(row=2, column=1, padx=10, sticky="ew")
 offset_checkbutton.config(width=10)
 
 # Bouton pour convertir le JSON et créer un fichier texte
 convert_button = tk.Button(root, text="Convert", command=convertir, state=tk.DISABLED)
-convert_button.grid(row=7, column=3, padx=10, sticky="se")
+convert_button.grid(row=70, column=1, columnspan=2, padx=10, pady=10, sticky="se")
 
 skin_id_var = tk.StringVar ()
 
 # Étiquette pour afficher les messages d'information
 info_label = tk.Label(root, text="", anchor="center")
 info_label.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
+
+# Zones de texte pour les offsets manuels
+offset_entries = {}
+for i, part_name in enumerate(["HEAD", "BODY", "ARM0", "ARM1", "LEG0", "LEG1"]):
+    offset_label = tk.Label(root, text=f"{part_name} Offset:")
+    offset_label.grid(row=3+i, column=1, padx=10, sticky="w")
+    offset_entry = tk.Entry(root, width=8)
+    offset_entry.grid(row=3+i, column=1, padx=100, sticky="ew")
+    offset_entries[part_name] = offset_entry
 
 
 root.mainloop()
