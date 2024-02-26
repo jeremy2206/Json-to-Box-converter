@@ -18,6 +18,8 @@ nombre_convertit = 0
 use_offset = False
 skin_id = None
 skin_image_path = None
+anim_var = None
+anim_options = None
 offset_values = {"HEAD": 0, "BODY": 0, "ARM0": 0, "ARM1": 0, "LEG0": 0, "LEG1": 0}
 
 
@@ -148,7 +150,7 @@ def convertir_json(data, use_auto_offset=False):
 
     result += "DISPLAYNAME:Skin Name\n"
     result += f"DISPLAYNAMEID:IDS_dlcskin_{skin_id}_DISPLAYNAME\n"
-    result += "ANIM:0x7ff5fc10\n"
+    result += f"ANIM:{anim_var.get()}\n"
     result += "THEMENAME:Theme Name\n"
     result += "GAME_FLAGS:0x18\n"
     result += "FREE:1\n"
@@ -200,11 +202,21 @@ def convertir_json(data, use_auto_offset=False):
                 offset_info = f"OFFSET:{part_name} Y {offset}\n"
 
                 boxes_info.append(box_info)
-                offsets_info.append(offset_info)
+                offsets_info.append(offset_info)        
 
     # Écrire les informations sur les boîtes d'abord, puis les offsets dans le fichier
     result += "".join(boxes_info) + "".join(offsets_info)
     return result
+
+
+# Fonction pour mettre à jour la valeur d'ANIM
+def update_anim_value():
+    result = anim_var.get()
+    print(f"Nouvelle valeur d'ANIM : {result}")
+
+# Liste des options pour ANIM
+anim_options = ["0x7ff5fc10", "0x40000"]
+
 
 
 def toggle_offset():
@@ -259,7 +271,6 @@ def generate_output_file_name(json_file_name, skin_id):
 
 root = tk.Tk()
 root.title("JSON To Box Converter")
-root.geometry("400x350")
 root.resizable(False, False)
 IconPath = os.path.abspath("assets/icon.ico")
 root.iconbitmap(IconPath)
@@ -285,12 +296,12 @@ TitleAppImageHeight = 35
 TitleAppImage = Image.new("RGBA", (TitleAppImageWidth, TitleAppImageHeight), (255, 255, 255, 0))
 TitleAppDraw = ImageDraw.Draw(TitleAppImage)
 TitleAppOutlineColor = (0, 0, 0)
-TitleAppOutlinePosition = (46.5, 4)
+TitleAppOutlinePosition = (76.5, 4)
 TitleAppDraw.text(TitleAppOutlinePosition, TitleAppText, font=TitleAppFont, fill=TitleAppOutlineColor)
 
 # Draw Text
 TitleAppTextColor = (255, 255, 255)
-TitleAppTextPosition = (44, 2)
+TitleAppTextPosition = (74, 2)
 TitleAppDraw.text(TitleAppTextPosition, TitleAppText, font=TitleAppFont, fill=TitleAppTextColor)
 
 # Convert Image to tk
@@ -364,6 +375,15 @@ for i, part_name in enumerate(["HEAD", "BODY", "ARM0", "ARM1", "LEG0", "LEG1"]):
     offset_entry = tk.Entry(root, width=8)
     offset_entry.grid(row=3+i, column=1, padx=100, sticky="ew")
     offset_entries[part_name] = offset_entry
+
+# Configuration initiale de la valeur d'ANIM
+anim_var = tk.StringVar()
+anim_var.set("0x7ff5fc10")  # Valeur par défaut
+anim_var.trace("w", lambda *args: update_anim_value())  # Suivre les changements de la valeur
+anim_label = tk.Label(root, text="ANIM:")
+anim_label.grid(row=3, column=0, padx=10, sticky="w")
+anim_menu = tk.OptionMenu(root, anim_var, *anim_options)
+anim_menu.grid(row=3, column=0, padx=60, sticky="w")
 
 
 root.mainloop()
