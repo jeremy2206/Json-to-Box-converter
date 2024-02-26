@@ -121,6 +121,7 @@ def convertir():
 
             # Créer le message avec un lien hypertexte
             message = f"Conversion complete. Check the file: Here."
+            nombre_convertit+=1
             info_label.config(text=message, fg="blue", cursor="hand2")
             info_label.bind("<Button-1>", lambda e: webbrowser.open(output_folder_path))
         else:
