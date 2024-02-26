@@ -31,5 +31,5 @@ An easier way to create customs skin for PCK Studio
 - [x] Can put manually the offset for each part
 - [x] Convert work for all skin
 ### Converter Things [ANIM]
-- [ ] can choose between a list of ANIM
+- [x] can choose between a list of ANIM
 
