@@ -140,7 +140,7 @@ def set_skin_id(event):
 
 def convertir_json(data, use_auto_offset=False):
     boxes_info = []  # Stocker les informations sur les boîtes
-    offsets_info = []  # Stocker les informations sur les offsets
+    offsets_info = {}  # Stocker les informations sur les offsets, en utilisant un dictionnaire pour garantir un seul offset par partie
 
     base_coordinates = {"HEAD": -8, "BODY": 0, "ARM0": -2, "ARM1": -2, "LEG0": 0, "LEG1": 0}
 
@@ -198,14 +198,17 @@ def convertir_json(data, use_auto_offset=False):
                     offset_entry_value = offset_entries.get(part_name).get()
                     offset = int(offset_entry_value) if offset_entry_value else 0
 
+                # Ajouter les informations de la boîte
                 box_info = f"BOX:{part_name} {origin[0]} {origin[1]} {origin[2]} {size[0]} {size[1]} {size[2]} {uv[0]} {uv[1]}\n"
-                offset_info = f"OFFSET:{part_name} Y {offset}\n"
-
                 boxes_info.append(box_info)
-                offsets_info.append(offset_info)        
+                
+                # Vérifier si un offset pour cette partie a déjà été ajouté
+                if part_name not in offsets_info:
+                    offset_info = f"OFFSET:{part_name} Y {offset}\n"
+                    offsets_info[part_name] = offset_info  # Ajouter cet offset à la liste des offsets ajoutés
 
-    # Écrire les informations sur les boîtes d'abord, puis les offsets dans le fichier
-    result += "".join(boxes_info) + "".join(offsets_info)
+    # Écrire les informations sur les boîtes et les offsets dans le résultat final
+    result += "".join(boxes_info) + "".join(offsets_info.values())
     return result
 
 
