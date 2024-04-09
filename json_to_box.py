@@ -219,7 +219,7 @@ def update_anim_value():
     print(f"Nouvelle valeur d'ANIM : {result}")
 
 # Liste des options pour ANIM
-anim_options = ["0x7ff5fc10", "0x40000"]
+anim_options = ["0x7ff5fc10", "0x40000","0x80000"]
 
 
 
